@@ -1,23 +1,33 @@
 import { useState } from "react";
-import { Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Check } from "lucide-react";
 
 const DEFAULT_TEXT = "TODO Item";
 
 export default function App() {
   const [todos, setTodos] = useState([
-    { id: "1", text: "Revisar requerimientos de Globant" },
-    { id: "2", text: "Probar el botón Add TODO" },
-    { id: "3", text: "Validar eliminación del primer ítem" },
+    { id: "1", text: "Revisar requerimientos de Globant", completed: true },
+    { id: "2", text: "Probar el botón Add TODO", completed: false },
+    { id: "3", text: "Validar eliminación del primer ítem", completed: false },
   ]);
   const [inputText, setInputText] = useState("");
   const [viewMode, setViewMode] = useState("styled"); // "styled" | "raw"
+
+  const totalCount = todos.length;
+  const completedCount = todos.filter((t) => t.completed).length;
+  const progressPercent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+
+  const handleToggleComplete = (id) => {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
+  };
 
   const handleAddTodo = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     const taskContent = inputText.trim() || DEFAULT_TEXT;
     setTodos((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), text: taskContent },
+      { id: crypto.randomUUID(), text: taskContent, completed: false },
     ]);
     setInputText("");
   };
@@ -25,7 +35,7 @@ export default function App() {
   const handleAddGeneric = () => {
     setTodos((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), text: DEFAULT_TEXT },
+      { id: crypto.randomUUID(), text: DEFAULT_TEXT, completed: false },
     ]);
   };
 
@@ -98,18 +108,32 @@ export default function App() {
         </div>
 
         <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 sm:p-7 shadow-xs">
-          <div className="mb-6 flex items-baseline justify-between border-b border-zinc-100 pb-4">
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-zinc-900">
-                TODO List
-              </h1>
-              <p className="text-xs text-zinc-600 mt-0.5">
-                Las tareas se ordenan cronológicamente y se eliminan desde arriba.
-              </p>
+          <div className="mb-6 border-b border-zinc-100 pb-4">
+            <div className="flex items-baseline justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-zinc-900">
+                  TODO List
+                </h1>
+                <p className="text-xs text-zinc-600 mt-0.5">
+                  Las tareas se ordenan cronológicamente y se eliminan desde arriba.
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-semibold text-zinc-900">
+                  {completedCount}/{totalCount} completadas
+                </span>
+                <span className="text-xs text-zinc-600 ml-1 font-mono">
+                  ({progressPercent}%)
+                </span>
+              </div>
             </div>
-            <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-600">
-              {todos.length} {todos.length === 1 ? "tarea" : "tareas"}
-            </span>
+
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+              <div
+                className="h-full bg-zinc-900 transition-all duration-300 ease-out"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
 
           <form onSubmit={handleAddTodo} className="mb-4">
@@ -190,17 +214,31 @@ export default function App() {
                           : "bg-white hover:bg-zinc-50/80"
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0 pr-2">
+                      <div className="flex items-center gap-2.5 min-w-0 pr-2 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleComplete(todo.id)}
+                          aria-label={todo.completed ? "Marcar como pendiente" : "Marcar como completada"}
+                          className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border transition ${
+                            todo.completed
+                              ? "border-emerald-600 bg-emerald-600 text-white"
+                              : "border-zinc-300 bg-white hover:border-zinc-400"
+                          }`}
+                        >
+                          {todo.completed && <Check size={12} strokeWidth={3} />}
+                        </button>
+
                         <span
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-[11px] font-mono font-semibold ${
-                            isFirst
+                            isFirst && !todo.completed
                               ? "bg-amber-500 text-white"
                               : "bg-zinc-100 text-zinc-600"
                           }`}
                         >
                           {index + 1}
                         </span>
-                        <span className={`truncate ${isFirst ? "font-semibold text-zinc-900" : "text-zinc-700"}`}>
+
+                        <span className={`truncate ${todo.completed ? "line-through text-zinc-400" : isFirst ? "font-semibold text-zinc-900" : "text-zinc-700"}`}>
                           {todo.text}
                         </span>
                       </div>
