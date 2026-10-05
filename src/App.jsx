@@ -1,16 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, CheckCircle2, Check } from "lucide-react";
 
 const DEFAULT_TEXT = "TODO Item";
+const STORAGE_KEY = "globant_todo_list_v2";
+
+const INITIAL_TODOS = [
+  { id: "1", text: "Revisar requerimientos de Globant", completed: true },
+  { id: "2", text: "Probar el botón Add TODO", completed: false },
+  { id: "3", text: "Validar eliminación del primer ítem", completed: false },
+];
 
 export default function App() {
-  const [todos, setTodos] = useState([
-    { id: "1", text: "Revisar requerimientos de Globant", completed: true },
-    { id: "2", text: "Probar el botón Add TODO", completed: false },
-    { id: "3", text: "Validar eliminación del primer ítem", completed: false },
-  ]);
+  const [todos, setTodos] = useState(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.error("Error al cargar tareas de localStorage:", e);
+    }
+    return INITIAL_TODOS;
+  });
+
   const [inputText, setInputText] = useState("");
   const [viewMode, setViewMode] = useState("styled"); // "styled" | "raw"
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    } catch (e) {
+      console.error("Error al guardar en localStorage:", e);
+    }
+  }, [todos]);
 
   const totalCount = todos.length;
   const completedCount = todos.filter((t) => t.completed).length;
