@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, CheckCircle2, Check } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Check, ListFilter } from "lucide-react";
 
 const DEFAULT_TEXT = "TODO Item";
 const STORAGE_KEY = "globant_todo_list_v2";
@@ -26,6 +26,7 @@ export default function App() {
 
   const [inputText, setInputText] = useState("");
   const [viewMode, setViewMode] = useState("styled"); // "styled" | "raw"
+  const [filter, setFilter] = useState("all"); // "all" | "active" | "completed"
 
   useEffect(() => {
     try {
@@ -37,7 +38,18 @@ export default function App() {
 
   const totalCount = todos.length;
   const completedCount = todos.filter((t) => t.completed).length;
+  const pendingCount = totalCount - completedCount;
   const progressPercent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+
+  const handleClearCompleted = () => {
+    setTodos((prev) => prev.filter((t) => !t.completed));
+  };
+
+  const filteredTodos = todos.filter((t) => {
+    if (filter === "active") return !t.completed;
+    if (filter === "completed") return t.completed;
+    return true;
+  });
 
   const handleToggleComplete = (id) => {
     setTodos((prev) =>
@@ -207,26 +219,53 @@ export default function App() {
             </div>
           </div>
 
+          {/* Barra de Filtros */}
+          <div className="mb-3 flex items-center justify-between border-b border-zinc-100 pb-2 text-xs">
+            <div className="flex items-center gap-1 text-zinc-600">
+              <ListFilter size={14} className="text-zinc-600 mr-1" />
+              {[
+                { key: "all", label: `Todas (${totalCount})` },
+                { key: "active", label: `Pendientes (${pendingCount})` },
+                { key: "completed", label: `Completadas (${completedCount})` },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setFilter(tab.key)}
+                  className={`rounded-md px-2 py-1 font-medium transition ${
+                    filter === tab.key
+                      ? "bg-zinc-100 text-zinc-900 font-semibold"
+                      : "text-zinc-600 hover:text-zinc-800"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {completedCount > 0 && (
+              <button
+                onClick={handleClearCompleted}
+                className="text-xs text-zinc-600 hover:text-red-600 transition"
+              >
+                Limpiar completadas
+              </button>
+            )}
+          </div>
+
           <div>
             <div className="mb-2 flex items-center justify-between px-1 text-xs font-semibold text-zinc-600 uppercase tracking-wider">
               <span>Orden de atención</span>
               <span>Posición</span>
             </div>
 
-            {todos.length === 0 ? (
+            {filteredTodos.length === 0 ? (
               <div className="rounded-xl border border-dashed border-zinc-200 p-8 text-center">
                 <CheckCircle2 size={32} className="mx-auto text-zinc-600 mb-2" />
-                <p className="text-sm font-medium text-zinc-700">No hay tareas pendientes</p>
-                <button
-                  onClick={handleAddGeneric}
-                  className="mt-3 text-xs font-medium text-zinc-900 underline underline-offset-4 hover:text-zinc-700"
-                >
-                  + Agregar &quot;{DEFAULT_TEXT}&quot; rápido
-                </button>
+                <p className="text-sm font-medium text-zinc-700">No hay tareas</p>
               </div>
             ) : (
               <ol className="divide-y divide-zinc-100 rounded-xl border border-zinc-200/80 overflow-hidden">
-                {todos.map((todo, index) => {
+                {filteredTodos.map((todo, index) => {
                   const isFirst = index === 0;
                   return (
                     <li
