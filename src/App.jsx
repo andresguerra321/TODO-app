@@ -11,12 +11,12 @@ import {
 } from "lucide-react";
 
 const DEFAULT_TEXT = "TODO Item";
-const STORAGE_KEY = "globant_todo_list_v2";
+const STORAGE_KEY = "Guerrita_todo_list_v2";
 
 const INITIAL_TODOS = [
   {
     id: "init-1",
-    text: "Revisar requerimientos de Globant",
+    text: "Revisar requerimientos de Don Guerra",
     completed: true,
     priority: "high",
     category: "Trabajo",
@@ -211,14 +211,21 @@ export default function App() {
         <h1>TODO List</h1>
         <p>Cumplimiento estricto de criterios de aceptación base:</p>
 
-        <div style={{ margin: "16px 0" }}>
-          <button onClick={handleAddGeneric} style={{ marginRight: "10px" }}>
+        <form onSubmit={handleAddTodo} style={{ margin: "16px 0" }}>
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Escribe una tarea..."
+            style={{ marginRight: "10px", padding: "4px" }}
+          />
+          <button type="submit" style={{ marginRight: "10px" }}>
             Add TODO
           </button>
-          <button onClick={handleDeleteFirst} disabled={todos.length === 0}>
+          <button type="button" onClick={handleDeleteFirst} disabled={todos.length === 0}>
             Delete first TODO
           </button>
-        </div>
+        </form>
 
         <ul>
           {todos.map((todo) => (
@@ -237,7 +244,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-zinc-100/70 text-zinc-900 antialiased font-sans flex flex-col justify-between p-4 sm:p-8">
       <main className="mx-auto w-full max-w-xl my-4 sm:my-auto">
-        
+
         {/* Barra superior: Identificación y Conmutador de Modo */}
         <header className="mb-4 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
@@ -250,22 +257,20 @@ export default function App() {
           <div className="inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 shadow-2xs text-xs">
             <button
               onClick={() => setViewMode("styled")}
-              className={`rounded-md px-2.5 py-1 font-medium transition ${
-                viewMode === "styled"
+              className={`rounded-md px-2.5 py-1 font-medium transition ${viewMode === "styled"
                   ? "bg-zinc-900 text-white shadow-2xs"
                   : "text-zinc-600 hover:text-zinc-900"
-              }`}
+                }`}
             >
               Diseño
             </button>
             <button
               onClick={() => setViewMode("raw")}
               title="Ver versión con HTML semántico puro sin estilos (Criterio obligatorio)"
-              className={`rounded-md px-2.5 py-1 font-medium transition ${
-                viewMode === "raw"
+              className={`rounded-md px-2.5 py-1 font-medium transition ${viewMode === "raw"
                   ? "bg-zinc-900 text-white shadow-2xs"
                   : "text-zinc-600 hover:text-zinc-900"
-              }`}
+                }`}
             >
               HTML Puro
             </button>
@@ -274,7 +279,7 @@ export default function App() {
 
         {/* Tarjeta Principal */}
         <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 sm:p-7 shadow-xs">
-          
+
           {/* Cabecera y Barra de Progreso */}
           <div className="mb-5 border-b border-zinc-100 pb-4">
             <div className="flex items-baseline justify-between">
@@ -346,11 +351,10 @@ export default function App() {
                     key={p.key}
                     type="button"
                     onClick={() => setInputPriority(p.key)}
-                    className={`rounded px-2 py-0.5 font-medium transition ${
-                      inputPriority === p.key
+                    className={`rounded px-2 py-0.5 font-medium transition ${inputPriority === p.key
                         ? "bg-white text-zinc-900 shadow-2xs"
                         : "text-zinc-600 hover:text-zinc-900"
-                    }`}
+                      }`}
                   >
                     {p.label}
                   </button>
@@ -366,11 +370,10 @@ export default function App() {
                     key={cat}
                     type="button"
                     onClick={() => setInputCategory(cat)}
-                    className={`rounded px-2 py-0.5 font-medium transition ${
-                      inputCategory === cat
+                    className={`rounded px-2 py-0.5 font-medium transition ${inputCategory === cat
                         ? "bg-white text-zinc-900 shadow-2xs"
                         : "text-zinc-600 hover:text-zinc-900"
-                    }`}
+                      }`}
                   >
                     {cat}
                   </button>
@@ -420,11 +423,10 @@ export default function App() {
                 <button
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
-                  className={`rounded-md px-2 py-1 font-medium transition ${
-                    filter === tab.key
+                  className={`rounded-md px-2 py-1 font-medium transition ${filter === tab.key
                       ? "bg-zinc-100 text-zinc-900 font-semibold"
                       : "text-zinc-600 hover:text-zinc-800"
-                  }`}
+                    }`}
                 >
                   {tab.label}
                 </button>
@@ -450,8 +452,8 @@ export default function App() {
                   {filter === "completed"
                     ? "No hay tareas completadas todavía"
                     : filter === "active"
-                    ? "¡Todo listo! No tienes tareas pendientes"
-                    : "No hay tareas en la lista"}
+                      ? "¡Todo listo! No tienes tareas pendientes"
+                      : "No hay tareas en la lista"}
                 </p>
                 <p className="text-xs text-zinc-600 mt-1">
                   {totalCount === 0
@@ -478,13 +480,12 @@ export default function App() {
                   return (
                     <li
                       key={todo.id}
-                      className={`group flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition ${
-                        isTopItem && !todo.completed
+                      className={`group flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition ${isTopItem && !todo.completed
                           ? "bg-amber-50/40 hover:bg-amber-50/70"
                           : todo.completed
-                          ? "bg-zinc-50/50 hover:bg-zinc-50"
-                          : "hover:bg-zinc-50/70"
-                      }`}
+                            ? "bg-zinc-50/50 hover:bg-zinc-50"
+                            : "hover:bg-zinc-50/70"
+                        }`}
                     >
                       {/* Checkbox + Posición + Texto de la Tarea */}
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -493,22 +494,20 @@ export default function App() {
                           type="button"
                           onClick={() => handleToggleComplete(todo.id)}
                           aria-label={todo.completed ? "Marcar como pendiente" : "Marcar como completada"}
-                          className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border transition ${
-                            todo.completed
+                          className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border transition ${todo.completed
                               ? "border-emerald-600 bg-emerald-600 text-white"
                               : "border-zinc-300 bg-white hover:border-zinc-400"
-                          }`}
+                            }`}
                         >
                           {todo.completed && <Check size={12} strokeWidth={3} />}
                         </button>
 
                         {/* Índice numérico en la cola */}
                         <span
-                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-[11px] font-mono font-semibold ${
-                            isTopItem && !todo.completed
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-[11px] font-mono font-semibold ${isTopItem && !todo.completed
                               ? "bg-amber-500 text-white"
                               : "bg-zinc-100 text-zinc-600"
-                          }`}
+                            }`}
                         >
                           {absoluteIndex + 1}
                         </span>
@@ -547,13 +546,12 @@ export default function App() {
                             className="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
                           >
                             <span
-                              className={`truncate font-medium transition ${
-                                todo.completed
+                              className={`truncate font-medium transition ${todo.completed
                                   ? "line-through text-zinc-600"
                                   : isTopItem
-                                  ? "text-zinc-900 font-semibold"
-                                  : "text-zinc-800"
-                              }`}
+                                    ? "text-zinc-900 font-semibold"
+                                    : "text-zinc-800"
+                                }`}
                             >
                               {todo.text}
                             </span>
